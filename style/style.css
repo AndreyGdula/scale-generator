@@ -1,0 +1,105 @@
+@charset "UTF-8";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --background-color: rgb(235, 232, 232);
+    --primary-color: #126c8d;
+    --primary-color-hover: #0c4e64;
+    --text-color: black;
+    --text-secundary-color: white;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: "Arial", sans-serif;
+}
+
+header {
+    background-color: var(--primary-color);
+    color: var(--text-secundary-color);
+    padding: 1rem;
+    text-align: center;
+}
+
+div.chips-input, div.restriction-group {
+    display: flex;
+    justify-self: center;
+    flex-direction: column;
+    margin: 30px 0px 10px 0px;
+}
+
+input#workers {
+    width: 80vw;
+    height: 30px;
+    margin: 10px 0px;
+    border-radius: 20px;
+    border: 1px solid var(--primary-color);
+    padding: 10px;
+    justify-self: center;
+}
+
+div.group {
+    width: 80vw;
+    height: 60px;
+    border: 2px dashed var(--primary-color);
+    margin: 10px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border-radius: 10px;
+}
+
+span.placeholder-restriction {
+    color: gray;
+    font-style: italic;
+}
+
+input[type="button"] {
+    background-color: var(--primary-color);
+    color: var(--text-secundary-color);
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px auto;
+    width: 98%;
+    user-select: none;
+}
+
+div.chip {
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: smaller;
+    font-weight: bold;
+    margin: 5px;
+}
+
+div.chips-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 80vw;
+}
+
+span.delete-chip {
+    margin-left: 3px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+    user-select: none;
+    transform: translate(0, 2px);
+}
+
+.hover-drop {
+    background-color: var(--primary-color-hover);
+}
