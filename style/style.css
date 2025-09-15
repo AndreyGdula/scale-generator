@@ -7,7 +7,7 @@
 }
 
 :root {
-    --background-color: rgb(235, 232, 232);
+    --background-color: #ebe8e8;
     --primary-color: #126c8d;
     --primary-color-hover: #0c4e64;
     --text-color: black;
@@ -54,6 +54,7 @@ div.group {
     justify-content: center;
     background-color: white;
     border-radius: 10px;
+    position: relative;
 }
 
 span.placeholder-restriction {
@@ -102,4 +103,29 @@ span.delete-chip {
 
 .hover-drop {
     background-color: var(--primary-color-hover);
+}
+
+input.add-group {
+    width: 80vw;
+    height: 60px;
+    border: 2px dashed gray;
+    margin: 10px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border-radius: 10px;
+    color: var(--primary-color);
+    font-size: 24px;
+}
+
+span.close-group {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 20px;
+    user-select: none;
+    color: var(--primary-color);
 }
