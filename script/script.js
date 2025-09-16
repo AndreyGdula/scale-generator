@@ -2,6 +2,7 @@ const inputWorkers = document.querySelector('input#workers')
 const chipsContainer = document.querySelector('.chips-container')
 const group = document.querySelector('div.group')
 const groupContainer = document.querySelector('div.group-container')
+const calendarCell = document.querySelectorAll('td.calendar-cell')
 
 inputWorkers.addEventListener('keydown', function(event) {
     if (event.key === 'Enter' || event.key === ',') {
@@ -61,6 +62,9 @@ function activeSortable(el, isSource = false) {
 }
 activeSortable(chipsContainer, true)
 activeSortable(group)
+document.querySelectorAll('td.calendar-cell').forEach(td => {
+    activeSortable(td)
+})
 
 function togglePlaceholder(container) {
     const placeholder = container.querySelector('span.placeholder-restriction')
@@ -108,4 +112,35 @@ function activeDeleteChipFonte() {
             }
         }
     })
+}
+
+function helpBox(helpId) {
+    const help = document.querySelector(`div.help#${helpId}`)
+    const isHidden = window.getComputedStyle(help).display === 'none'
+    help.style.display = isHidden ? 'block' : 'none'
+}
+
+function removeDay(dayBtn) {
+    const day = document.querySelector(`#${dayBtn}`)
+    const btnIcon = day.children[0]
+    const tdDesatived = day.parentElement
+
+    const desativedColor = '#06242eff'
+    const tdDesativedColor = '#b1b8bdff'
+
+    if (btnIcon.innerHTML === 'check') {
+        day.style.backgroundColor = desativedColor
+        day.style.borderColor = desativedColor
+        day.style.color = tdDesativedColor
+        tdDesatived.style.borderColor = desativedColor
+        tdDesatived.style.backgroundColor = tdDesativedColor
+        btnIcon.innerHTML = 'close'
+    } else {
+        day.style.backgroundColor = ''
+        day.style.borderColor = ''
+        day.style.color = ''
+        tdDesatived.style.borderColor = ''
+        tdDesatived.style.backgroundColor = ''
+        btnIcon.innerHTML = 'check'
+    }
 }
