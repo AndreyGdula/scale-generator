@@ -32,6 +32,7 @@ div.chips-input, div.restriction-group, div.calendar {
     justify-self: center;
     flex-direction: column;
     margin: 30px 0px 10px 0px;
+    position: relative;
 }
 
 input#workers {
@@ -158,10 +159,10 @@ div.help {
     border-radius: 10px;
     padding: 10px;
     margin-top: 5px;
-    max-width: 80vw;
+    max-width: 81vw;
     font-size: 12px;
-    position: relative;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.288);
+    box-shadow: 2px 2px 20px 0px rgba(0, 0, 0, 0.534);
+    z-index: 100;
 }
 
 table {
@@ -198,4 +199,13 @@ div.calendar-container {
     border: 2px solid var(--primary-color);
     border-radius: 20px;
     margin: 10px auto;
+}
+
+div.alert {
+    display: none;
+    width: 80vw;
+    text-align: center;
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 15px;
 }
