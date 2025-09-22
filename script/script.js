@@ -3,12 +3,15 @@ const chipsContainer = document.querySelector('.chips-container')
 const group = document.querySelector('div.group')
 const groupContainer = document.querySelector('div.group-container')
 const calendarCell = document.querySelectorAll('td.calendar-cell')
-const alertWorkers = document.querySelector('div.alert')
+const table = document.querySelector('#calendar-table')
+const alertWorkers = document.querySelector('div#alertWorkers')
+const alertButton = document.querySelector('div#alertButton')
 let workerList = []
 let dayScale = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
 
 inputWorkers.addEventListener('keydown', function(event) {
     alertWorkers.style.display = 'none'
+    alertButton.style.display = 'none'
     if (event.key === 'Enter' || event.key === ',') {
         event.preventDefault()
         const name = inputWorkers.value.charAt(0).toUpperCase() + inputWorkers.value.trim().replace(',', '').slice(1).toLowerCase()
@@ -18,6 +21,7 @@ inputWorkers.addEventListener('keydown', function(event) {
             workerList.push(name)
         } else if (workerList.includes(name)) {
             alertWorkers.style.display = 'block'
+            alertWorkers.textContent = 'Colaborador já foi inserido.'
             inputWorkers.value = ''
         }
     }
@@ -145,6 +149,16 @@ function removeDay(dayBtn) {
         tdDesatived.style.backgroundColor = tdDesativedColor
         btnIcon.innerHTML = 'close'
         dayScale = dayScale.filter(d => d !== dayBtn)
+
+        let nextRow = tdDesatived.nextSibling
+        while (nextRow && nextRow.classList && nextRow.classList.contains('extra-row')) {
+            nextRow.style.backgroundColor = tdDesativedColor
+            nextRow.querySelectorAll('td').forEach(td => {
+                td.style.backgroundColor = tdDesativedColor
+                td.style.borderColor = desativedColor
+            })
+            nextRow = nextRow.nextSibling
+        }
     } else {
         day.style.backgroundColor = ''
         day.style.borderColor = ''
@@ -153,6 +167,16 @@ function removeDay(dayBtn) {
         tdDesatived.style.backgroundColor = ''
         btnIcon.innerHTML = 'check'
         dayScale.push(dayBtn)
+
+        let nextRow = tdDesatived.nextSibling
+        while (nextRow && nextRow.classList && nextRow.classList.contains('extra-row')) {
+            nextRow.style.backgroundColor = ''
+            nextRow.querySelectorAll('td').forEach(td => {
+                td.style.backgroundColor = ''
+                td.style.borderColor = ''
+            })
+            nextRow = nextRow.nextSibling
+        }
     }
 }
 
@@ -171,207 +195,101 @@ function getRestrictionGroups() {
     return groups
 }
 
-// Teste de código 
-/* ---------- HELPERS ---------- */
-function shuffleArray(arr) {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-}
-
-function isConflict(worker, assignedForDay, groups) {
-    // retorna true se para algum grupo que contenha 'worker' já exista membro alocado nesse dia
-    for (const group of groups) {
-        if (group.includes(worker)) {
-            for (const member of assignedForDay) {
-                if (group.includes(member)) return true;
-            }
-        }
-    }
-    return false;
-}
-
-function createScaleChip(name) {
-    const chip = document.createElement('div');
-    chip.className = 'chip';
-    const nameSpan = document.createElement('span');
-    nameSpan.className = 'chip-name';
-    nameSpan.textContent = name;
-    chip.appendChild(nameSpan);
-    return chip;
-}
-
-/* ---------- LIMPAR CALENDÁRIO (remove linhas extras e limpa células) ---------- */
-function clearCalendar() {
-    const table = document.querySelector('#calendar-table');
-    if (!table) return;
-
-    // copia estática das linhas
-    const rows = Array.from(table.querySelectorAll('tr'));
-    rows.forEach(row => {
-        const th = row.querySelector('th');
-
-        // remover linhas que foram criadas como continuação (th sem id ou com classe day-continue)
-        if (!th || !th.id || th.classList.contains('day-continue')) {
-            row.remove();
-            return;
-        }
-
-        // main header row: limpar conteúdo das tds e manter apenas 3 células visíveis
-        const tds = Array.from(row.querySelectorAll('td.calendar-cell'));
-        tds.forEach(td => td.innerHTML = '');
-
-        // se houver mais de 3 cells (criados em uma geração anterior), remove os extras
-        for (let i = tds.length - 1; i >= 3; i--) {
-            tds[i].remove();
-        }
-    });
-}
-
-/* ---------- ADICIONAR TRABALHADORES PARA UM DIA (3 por linha; cria novas linhas abaixo) ---------- */
-function addWorkersToDay(th, workers) {
-    if (!th) return;
-    const row = th.parentElement;
-    const tableBody = row.parentElement; // tbody ou table
-    const perRow = 3;
-    let idx = 0;
-
-    // Determinar nó antes do qual devemos inserir novas linhas: o próximo "main header" (próximo <tr> cujo <th> tem id)
-    function nextMainHeaderAfter(originalRow) {
-        let el = originalRow.nextElementSibling;
-        while (el) {
-            const elTh = el.querySelector('th');
-            if (elTh && elTh.id) return el;
-            el = el.nextElementSibling;
-        }
-        return null; // inserir no fim
-    }
-    const insertBeforeNode = nextMainHeaderAfter(row);
-
-    while (idx < workers.length) {
-        const chunk = workers.slice(idx, idx + perRow);
-        let targetRow;
-
-        if (idx === 0) {
-            targetRow = row;
-        } else {
-            // cria nova linha de continuação
-            targetRow = document.createElement('tr');
-
-            const emptyTh = document.createElement('th');
-            emptyTh.className = 'day-continue'; // marca como continuação
-            emptyTh.textContent = ''; // vazio (estilizar via CSS se quiser)
-            targetRow.appendChild(emptyTh);
-
-            // inserir antes do próximo main header (ou no final)
-            tableBody.insertBefore(targetRow, insertBeforeNode);
-        }
-
-        // garantir que targetRow tem pelo menos 'perRow' cells
-        while (targetRow.querySelectorAll('td.calendar-cell').length < perRow) {
-            const td = document.createElement('td');
-            td.className = 'calendar-cell';
-            // habilita Sortable nas novas células
-            activeSortable(td);
-            targetRow.appendChild(td);
-        }
-
-        // preenche as células disponíveis (apenas até chunk.length)
-        const cells = Array.from(targetRow.querySelectorAll('td.calendar-cell'));
-        chunk.forEach((name, i) => {
-            const chip = createScaleChip(name);
-            cells[i].appendChild(chip);
-        });
-
-        idx += perRow;
-    }
-}
-
-/* ---------- RESOLVER ATRIBUIÇÃO (Backtracking com limite de tempo/operações) ---------- */
-function solveAssignment(workers, days, groups, options = {}) {
-    const timeLimitMs = options.timeLimitMs ?? 1500; // tempo máximo para tentar (ms)
-    const opLimit = options.opLimit ?? 200000; // operações máximas
-    const start = Date.now();
-    let ops = 0;
-
-    // Estrutura inicial de atribuição
-    const assigned = {};
-    days.forEach(d => assigned[d] = []);
-
-    // Ordem de tentativa dos workers (embaralhada para variar)
-    const workerOrder = shuffleArray(workers.slice());
-
-    function canPlace(worker, day) {
-        return !isConflict(worker, assigned[day], groups);
-    }
-
-    function backtrack(index) {
-        if (Date.now() - start > timeLimitMs) return false;
-        if (ops++ > opLimit) return false;
-        if (index >= workerOrder.length) return true;
-
-        const worker = workerOrder[index];
-        // candidatos dias onde é possível colocar esse worker
-        const candidates = days.filter(d => canPlace(worker, d));
-        // ordenar candidatos por balanceamento (menos ocupados primeiro)
-        candidates.sort((a,b) => assigned[a].length - assigned[b].length);
-
-        for (const d of candidates) {
-            assigned[d].push(worker);
-            if (backtrack(index + 1)) return true;
-            assigned[d].pop();
-        }
-        return false;
-    }
-
-    const ok = backtrack(0);
-    return ok ? assigned : null;
-}
-
-/* ---------- FUNÇÃO PRINCIPAL: generateScale ---------- */
-function generateScale() {
-    if (workerList.length === 0) {
-        alert('Insira ao menos um colaborador para gerar a escala.');
-        return;
-    }
-
-    // Normaliza e ordena os dias
+function orderDays() {
     const dayOrder = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
     const days = Array.from(new Set(dayScale))
         .filter(d => dayOrder.includes(d))
         .sort((a,b) => dayOrder.indexOf(a) - dayOrder.indexOf(b));
+    return days
+}
 
-    if (days.length === 0) {
-        alert('Nenhum dia ativo para gerar a escala.');
-        return;
+function sortWorkers() { // Corrigir está função para evitar nomes conflitantes
+    const days = orderDays()
+    const result = []
+    const groups = getRestrictionGroups()
+    let workers = [...workerList]
+
+    const groupMap = {}
+    groups.forEach(group => {
+        group.forEach(name => {
+            groupMap[name] = group
+        })
+    })
+
+    let dayIndex = 0
+    while (workers.length > 0) {
+        const day = days[dayIndex % days.length]
+        if (!result[day]) result[day] = []
+
+        const namesInDay = result[day]
+        const candidates = workers.filter(name => {
+            if (!groupMap[name]) return true
+            return !namesInDay.some(n => groupMap[n] === groupMap[name])
+        })
+        if (candidates.length === 0) {
+            dayIndex++
+            continue
+        }
+
+        const sorted = Math.floor(Math.random() * candidates.length)
+        const nameSorted = candidates[sorted]
+        result[day].push(nameSorted)
+        workers = workers.filter(n => n !== nameSorted)
+        dayIndex++
     }
+    return result
+}
 
-    const groups = getRestrictionGroups();
-    const workers = workerList.slice();
+function fillTable(scale) {
+    calendarCell.forEach(td => td.innerHTML = '')
+    Array.from(table.querySelectorAll('.extra-row')).forEach(tr => tr.remove())
+    Object.entries(scale).forEach(([day, names]) => {
+        const tr = table.querySelector(`th#${day}`).parentElement
+        const tds = Array.from(tr.querySelectorAll('td.calendar-cell'))
+        
+        names.forEach((name, i) => {
+            if (i < tds.length) {
+                tds[i].innerHTML = `<div class="chip"><span class="chip-name">${name}</span></div>`
+            }
+        })
 
-    // limpar calendário antes de gerar (remove linhas extras, limpa células)
-    clearCalendar();
+        const numExtras = Math.ceil((names.length - tds.length) / tds.length)
+        tr.querySelector('th').rowSpan = numExtras + 1
 
-    // tentar encontrar solução exata
-    const assignment = solveAssignment(workers, days, groups, { timeLimitMs: 1500, opLimit: 200000 });
+        let extraIndex = tds.length
+        while (extraIndex < names.length) {
+            const extraRow = document.createElement('tr')
+            const thNull = document.createElement('th')
+            extraRow.className = 'extra-row'
+            thNull.innerHTML = ''
+            extraRow.appendChild(thNull)
 
-    if (!assignment) {
-        alert('Não foi possível gerar a escala respeitando todas as restrições definidas. Reveja seus grupos/remoções de dias.');
-        console.warn('Falha ao gerar escala com restrições. Workers:', workers, 'Days:', days, 'Groups:', groups);
-        return;
+            for (let i = 0; i < tds.length; i++) {
+                const td = document.createElement('td')
+                td.className = 'calendar-cell'
+                const nameExtra = names[extraIndex]
+                if (nameExtra) {
+                    td.innerHTML = `<div class="chip"><span class="chip-name">${nameExtra}</span></div>`
+                }
+                extraRow.appendChild(td)
+                extraIndex++
+            }
+            tr.parentNode.insertBefore(extraRow, tr.nextSibling)
+        }
+
+    })
+}
+
+function generateScale() {
+    if (workerList.length === 0) {
+        alertButton.style.display = 'block'
+        alertButton.textContent = 'Adicione trabalhadores para gerar a escala'
+        return
+    } else if (dayScale.length === 0) {
+        alertButton.style.display = 'block'
+        alertButton.textContent = 'Selecione ao menos um dia para gerar a escala'
+        return
     }
-
-    // preenche a tabela de acordo com assignment
-    for (const dayId of days) {
-        const th = document.querySelector(`#${dayId}`);
-        if (!th) continue;
-        const assignedForDay = assignment[dayId] || [];
-        addWorkersToDay(th, assignedForDay);
-    }
-
-    // opcional: log pra depurar
-    console.log('Escala gerada com sucesso:', assignment);
+    const sort = sortWorkers()
+    const tableFill = fillTable(sort)
 }
