@@ -4,14 +4,13 @@ const group = document.querySelector('div.group')
 const groupContainer = document.querySelector('div.group-container')
 const calendarCell = document.querySelectorAll('td.calendar-cell')
 const table = document.querySelector('#calendar-table')
-const alertWorkers = document.querySelector('div#alertWorkers')
-const alertButton = document.querySelector('div#alertButton')
+const generateButton = document.querySelector('input.generate-btn')
+const alertPopContainer = document.querySelector('div.alert-container')
+const alertPop = document.querySelector('p#pop-up')
 let workerList = []
 let dayScale = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
 
 inputWorkers.addEventListener('keydown', function(event) {
-    alertWorkers.style.display = 'none'
-    alertButton.style.display = 'none'
     if (event.key === 'Enter' || event.key === ',') {
         event.preventDefault()
         const name = inputWorkers.value.charAt(0).toUpperCase() + inputWorkers.value.trim().replace(',', '').slice(1).toLowerCase()
@@ -20,8 +19,8 @@ inputWorkers.addEventListener('keydown', function(event) {
             inputWorkers.value = ''
             workerList.push(name)
         } else if (workerList.includes(name)) {
-            alertWorkers.style.display = 'block'
-            alertWorkers.textContent = 'Colaborador já foi inserido.'
+            alertPopContainer.style.display = 'flex'
+            alertPop.textContent = 'Colaborador já foi inserido.'
             inputWorkers.value = ''
         }
     }
@@ -203,42 +202,74 @@ function orderDays() {
     return days
 }
 
-function sortWorkers() { // Corrigir está função para evitar nomes conflitantes
-    const days = orderDays()
-    const result = []
+// inicio teste de código
+function getRestrictionPairs() {
     const groups = getRestrictionGroups()
-    let workers = [...workerList]
+    const pairs = new Set()
 
-    const groupMap = {}
     groups.forEach(group => {
-        group.forEach(name => {
-            groupMap[name] = group
-        })
+        for (let i = 0; i < group.length; i++) {
+            for (let j = i + 1; j < group.length; j++) {
+                const a = group[i]
+                const b = group[j]
+                // Armazena sempre ordenado para evitar duplicatas (a,b) e (b,a)
+                pairs.add([a, b].sort().join('|'))
+            }
+        }
     })
 
-    let dayIndex = 0
-    while (workers.length > 0) {
-        const day = days[dayIndex % days.length]
-        if (!result[day]) result[day] = []
-
-        const namesInDay = result[day]
-        const candidates = workers.filter(name => {
-            if (!groupMap[name]) return true
-            return !namesInDay.some(n => groupMap[n] === groupMap[name])
-        })
-        if (candidates.length === 0) {
-            dayIndex++
-            continue
-        }
-
-        const sorted = Math.floor(Math.random() * candidates.length)
-        const nameSorted = candidates[sorted]
-        result[day].push(nameSorted)
-        workers = workers.filter(n => n !== nameSorted)
-        dayIndex++
-    }
-    return result
+    return pairs
 }
+
+function areCompatible(a, b, pairs) {
+    return !pairs.has([a, b].sort().join('|'))
+}
+
+function sortWorkers(maxAttempts = 1000) {
+    const days = orderDays()
+    const restrictionPairs = getRestrictionPairs()
+
+    let attempt = 0
+    let workers, result
+
+    while (attempt < maxAttempts) {
+        workers = [...workerList]
+        result = {}
+        let dayIndex = 0
+        let failed = false
+
+        while (workers.length > 0) {
+            const day = days[dayIndex % days.length]
+            if (!result[day]) result[day] = []
+
+            const namesInDay = result[day]
+            const candidates = workers.filter(name =>
+                namesInDay.every(n => areCompatible(n, name, restrictionPairs))
+            )
+
+            if (candidates.length === 0) {
+                failed = true
+                break // não conseguiu nesta tentativa, recomeça
+            }
+
+            const randomIndex = Math.floor(Math.random() * candidates.length)
+            const nameSorted = candidates[randomIndex]
+
+            result[day].push(nameSorted)
+            workers = workers.filter(n => n !== nameSorted)
+            dayIndex++
+        }
+        if (!failed) {
+            return result // deu certo, retorna
+        }
+        attempt++
+    }
+    alertPopContainer.style.display = 'flex'
+    alertPop.textContent = 'Não foi possível gerar a escala com as restrições atuais.'
+    return null
+}
+
+// fim teste de código
 
 function fillTable(scale) {
     calendarCell.forEach(td => td.innerHTML = '')
@@ -276,20 +307,24 @@ function fillTable(scale) {
             }
             tr.parentNode.insertBefore(extraRow, tr.nextSibling)
         }
-
     })
 }
 
 function generateScale() {
     if (workerList.length === 0) {
-        alertButton.style.display = 'block'
-        alertButton.textContent = 'Adicione trabalhadores para gerar a escala'
+        alertPopContainer.style.display = 'flex'
+        alertPop.textContent = 'Adicione trabalhadores para gerar a escala'
         return
     } else if (dayScale.length === 0) {
-        alertButton.style.display = 'block'
-        alertButton.textContent = 'Selecione ao menos um dia para gerar a escala'
+        alertPopContainer.style.display = 'flex'
+        alertPop.textContent = 'Selecione ao menos um dia para gerar a escala'
         return
     }
     const sort = sortWorkers()
     const tableFill = fillTable(sort)
+}
+
+function closePopAlert() {
+    alertPopContainer.style.display = 'none'
+    alertPop.textContent = ''
 }
