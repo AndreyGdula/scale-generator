@@ -12,6 +12,7 @@ let dayScale = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'
 
 inputWorkers.addEventListener('keydown', function(event) {
     if (event.key === 'Enter' || event.key === ',') {
+        generateButton.disabled = false
         event.preventDefault()
         const name = inputWorkers.value.charAt(0).toUpperCase() + inputWorkers.value.trim().replace(',', '').slice(1).toLowerCase()
         if (name && !workerList.includes(name)) {
@@ -19,8 +20,7 @@ inputWorkers.addEventListener('keydown', function(event) {
             inputWorkers.value = ''
             workerList.push(name)
         } else if (workerList.includes(name)) {
-            alertPopContainer.style.display = 'flex'
-            alertPop.textContent = 'Colaborador já foi inserido.'
+            showPopAlert('Colaborador já foi inserido.')
             inputWorkers.value = ''
         }
     }
@@ -100,7 +100,6 @@ function createGroup() {
         divGroup.remove()
     }
     divGroup.appendChild(closeGroup)
-
     activeSortable(divGroup)
 }
 
@@ -121,6 +120,7 @@ function activeDeleteChipFonte() {
                 })
                 workerList = workerList.filter(worker => worker !== name)
                 chip.remove()
+                generateButton.disabled = workerList.length === 0
             }
         }
     })
@@ -132,24 +132,25 @@ function helpBox(helpId) {
     help.style.display = isHidden ? 'block' : 'none'
 }
 
-function removeDay(dayBtn) {
-    const day = document.querySelector(`#${dayBtn}`)
-    const btnIcon = day.children[0]
-    const tdDesatived = day.parentElement
+function removeDay(dayId) {
+    const contentDiv = document.querySelector(`#${dayId}`)   // agora é o div.th-content
+    const th = contentDiv.closest('th')                      // pega o th pai
+    const btnIcon = contentDiv.querySelector('.day-btn')
+    const row = th.parentElement
 
     const desativedColor = '#06242eff'
     const tdDesativedColor = '#b1b8bdff'
 
     if (btnIcon.innerHTML === 'check') {
-        day.style.backgroundColor = desativedColor
-        day.style.borderColor = desativedColor
-        day.style.color = tdDesativedColor
-        tdDesatived.style.borderColor = desativedColor
-        tdDesatived.style.backgroundColor = tdDesativedColor
+        th.style.backgroundColor = desativedColor
+        th.style.borderColor = desativedColor
+        th.style.color = tdDesativedColor
+        row.style.borderColor = desativedColor
+        row.style.backgroundColor = tdDesativedColor
         btnIcon.innerHTML = 'close'
-        dayScale = dayScale.filter(d => d !== dayBtn)
+        dayScale = dayScale.filter(d => d !== dayId)
 
-        let nextRow = tdDesatived.nextSibling
+        let nextRow = row.nextSibling
         while (nextRow && nextRow.classList && nextRow.classList.contains('extra-row')) {
             nextRow.style.backgroundColor = tdDesativedColor
             nextRow.querySelectorAll('td').forEach(td => {
@@ -159,15 +160,15 @@ function removeDay(dayBtn) {
             nextRow = nextRow.nextSibling
         }
     } else {
-        day.style.backgroundColor = ''
-        day.style.borderColor = ''
-        day.style.color = ''
-        tdDesatived.style.borderColor = ''
-        tdDesatived.style.backgroundColor = ''
+        th.style.backgroundColor = ''
+        th.style.borderColor = ''
+        th.style.color = ''
+        row.style.borderColor = ''
+        row.style.backgroundColor = ''
         btnIcon.innerHTML = 'check'
-        dayScale.push(dayBtn)
+        dayScale.push(dayId)
 
-        let nextRow = tdDesatived.nextSibling
+        let nextRow = row.nextSibling
         while (nextRow && nextRow.classList && nextRow.classList.contains('extra-row')) {
             nextRow.style.backgroundColor = ''
             nextRow.querySelectorAll('td').forEach(td => {
@@ -178,6 +179,7 @@ function removeDay(dayBtn) {
         }
     }
 }
+
 
 function getRestrictionGroups() {
     const groups = []
@@ -264,8 +266,7 @@ function sortWorkers(maxAttempts = 1000) {
         }
         attempt++
     }
-    alertPopContainer.style.display = 'flex'
-    alertPop.textContent = 'Não foi possível gerar a escala com as restrições atuais.'
+    showPopAlert('Não foi possível gerar a escala com as restrições atuais.')
     return null
 }
 
@@ -290,10 +291,7 @@ function fillTable(scale) {
         let extraIndex = tds.length
         while (extraIndex < names.length) {
             const extraRow = document.createElement('tr')
-            const thNull = document.createElement('th')
             extraRow.className = 'extra-row'
-            thNull.innerHTML = ''
-            extraRow.appendChild(thNull)
 
             for (let i = 0; i < tds.length; i++) {
                 const td = document.createElement('td')
@@ -311,13 +309,8 @@ function fillTable(scale) {
 }
 
 function generateScale() {
-    if (workerList.length === 0) {
-        alertPopContainer.style.display = 'flex'
-        alertPop.textContent = 'Adicione trabalhadores para gerar a escala'
-        return
-    } else if (dayScale.length === 0) {
-        alertPopContainer.style.display = 'flex'
-        alertPop.textContent = 'Selecione ao menos um dia para gerar a escala'
+    if (dayScale.length === 0) {
+        showPopAlert('Selecione ao menos um dia para gerar a escala')
         return
     }
     const sort = sortWorkers()
@@ -327,4 +320,9 @@ function generateScale() {
 function closePopAlert() {
     alertPopContainer.style.display = 'none'
     alertPop.textContent = ''
+}
+
+function showPopAlert(msg) {
+    alertPopContainer.style.display = 'flex'
+    alertPop.textContent = msg
 }

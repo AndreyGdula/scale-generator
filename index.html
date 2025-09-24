@@ -13,93 +13,129 @@
     <header>
         <h1>GERADOR DE ESCALAS</h1>
     </header>
-    <div class="chips-input">
-        <h3>Insira os colaboradores</h3>
-        <input type="text" id="workers" placeholder="Insira os nomes">
-        <div class="alert" id="alertWorkers"></div>
-        <div class="chips-container"></div>
-    </div>
-    <div class="restriction-group"> 
-        <h3>Adicionar restrições <span class="help-btn material-symbols-outlined" onclick="helpBox('restriction')">help</span></h3>
-        <div class="help" id="restriction">
-            <p>Organize em grupos de restrição os colaboradores que não podem ficar escalados juntos no mesmo dia. Você pode criar quantos grupos precisar.</p>
+    <main>
+        <div class="chips-input">
+            <h3>Insira os colaboradores</h3>
+            <input type="text" id="workers" placeholder="Insira os nomes">
+            <div class="alert" id="alertWorkers"></div>
+            <div class="chips-container"></div>
         </div>
-        <div class="group-container"></div>
-        <input type="button" class="add-group" value="+" id="add-restriction-group" onclick="createGroup()">
-    </div>
-    <div class="calendar">
-        <h3>Calendário de escalas <span class="help-btn material-symbols-outlined" onclick="helpBox('calendar')">help</span></h3>
-        <div class="help" id="calendar">
-            <p>Aqui é onde as escalas geradas aparecem. Você pode eliminar os dias da escala clicando no nome do dia que deseja remover.</p>
+        <div class="restriction-group">
+            <h3>Adicionar restrições <span class="help-btn material-symbols-outlined" onclick="helpBox('restriction')">help</span></h3>
+            <div class="help" id="restriction">
+                <p>Organize em grupos de restrição os colaboradores que não podem ficar escalados juntos no mesmo dia. Você pode criar quantos grupos precisar.</p>
+            </div>
+            <div class="group-container"></div>
+            <input type="button" class="add-group" value="+" id="add-restriction-group" onclick="createGroup()">
         </div>
-        <div class="calendar-container">
-            <table id="calendar-table">
-                <tr>
-                    <th id="sunday" onclick="removeDay('sunday')">
-                        <span class="day-btn material-symbols-outlined">check</span>DOMINGO
-                    </th>
-                    <td class="calendar-cell"></td>
-                    <td class="calendar-cell"></td>
-                    <td class="calendar-cell"></td>
-                </tr>
-                <tr>
-                    <th id="monday" onclick="removeDay('monday')">
-                        <span class="day-btn material-symbols-outlined">check</span>SEGUNDA
-                    </th>
-                    <td class="calendar-cell"></td>
-                    <td class="calendar-cell"></td>
-                    <td class="calendar-cell"></td>
-                </tr>
-                <tr>
-                    <th id="tuesday" onclick="removeDay('tuesday')">
-                        <span class="day-btn material-symbols-outlined">check</span>TERÇA
-                    </th>
-                    <td class="calendar-cell"></td>
-                    <td class="calendar-cell"></td>
-                    <td class="calendar-cell"></td>
-                </tr>
-                <tr>
-                    <th id="wednesday" onclick="removeDay('wednesday')">
-                        <span class="day-btn material-symbols-outlined">check</span>QUARTA
-                    </th>
-                    <td class="calendar-cell"></td>
-                    <td class="calendar-cell"></td>
-                    <td class="calendar-cell"></td>
-                </tr>
-                <tr>
-                    <th id="thursday" onclick="removeDay('thursday')">
-                        <span class="day-btn material-symbols-outlined">check</span>QUINTA
-                    </th>
-                    <td class="calendar-cell"></td>
-                    <td class="calendar-cell"></td>
-                    <td class="calendar-cell"></td>
-                </tr>
-                <tr>
-                    <th id="friday" onclick="removeDay('friday')">
-                        <span class="day-btn material-symbols-outlined">check</span>SEXTA
-                    </th>
-                    <td class="calendar-cell"></td>
-                    <td class="calendar-cell"></td>
-                    <td class="calendar-cell"></td>
-                </tr>
-                <tr>
-                    <th id="saturday" onclick="removeDay('saturday')">
-                        <span class="day-btn material-symbols-outlined">check</span>SÁBADO
-                    </th>
-                    <td class="calendar-cell"></td>
-                    <td class="calendar-cell"></td>
-                    <td class="calendar-cell"></td>
-                </tr>
-            </table>
+        <div class="calendar">
+            <h3>Calendário de escalas <span class="help-btn material-symbols-outlined" onclick="helpBox('calendar')">help</span></h3>
+            <div class="help" id="calendar">
+                <p>Aqui é onde as escalas geradas aparecem. Você pode eliminar os dias da escala clicando no nome do dia que deseja remover.</p>
+            </div>
+            <div class="calendar-container">
+                <table id="calendar-table">
+                    <tr>
+                        <th id="sunday" onclick="removeDay('sunday')">
+                            <div class="th-container" id="sunday">
+                                <span class="day-btn material-symbols-outlined">check</span>
+                                <p>DOMINGO</p>
+                            </div>
+                        </th>
+                        <td class="calendar-cell"></td>
+                        <td class="calendar-cell"></td>
+                        <td class="calendar-cell"></td>
+                    </tr>
+                    <tr>
+                        <th id="monday" onclick="removeDay('monday')">
+                            <div class="th-container" id="monday">
+                                <span class="day-btn material-symbols-outlined">check</span>
+                                <p>SEGUNDA</p>
+                            </div>
+                        </th>
+                        <td class="calendar-cell"></td>
+                        <td class="calendar-cell"></td>
+                        <td class="calendar-cell"></td>
+                    </tr>
+                    <tr>
+                        <th id="tuesday" onclick="removeDay('tuesday')">
+                            <div class="th-container" id="tuesday">
+                                <span class="day-btn material-symbols-outlined">check</span>
+                                <p>TERÇA</p>
+                            </div>
+                        </th>
+                        <td class="calendar-cell"></td>
+                        <td class="calendar-cell"></td>
+                        <td class="calendar-cell"></td>
+                    </tr>
+                    <tr>
+                        <th id="wednesday" onclick="removeDay('wednesday')">
+                            <div class="th-container" id="wednesday">
+                                <span class="day-btn material-symbols-outlined">check</span>
+                                <p>QUARTA</p>
+                            </div>
+                        </th>
+                        <td class="calendar-cell"></td>
+                        <td class="calendar-cell"></td>
+                        <td class="calendar-cell"></td>
+                    </tr>
+                    <tr>
+                        <th id="thursday" onclick="removeDay('thursday')">
+                            <div class="th-container" id="thursday">
+                                <span class="day-btn material-symbols-outlined">check</span>
+                                <p>QUINTA</p>
+                            </div>
+                        </th>
+                        <td class="calendar-cell"></td>
+                        <td class="calendar-cell"></td>
+                        <td class="calendar-cell"></td>
+                    </tr>
+                    <tr>
+                        <th id="friday" onclick="removeDay('friday')">
+                            <div class="th-container" id="friday">
+                                <span class="day-btn material-symbols-outlined">check</span>
+                                <p>SEXTA</p>
+                            </div>
+                        </th>
+                        <td class="calendar-cell"></td>
+                        <td class="calendar-cell"></td>
+                        <td class="calendar-cell"></td>
+                    </tr>
+                    <tr>
+                        <th id="saturday" onclick="removeDay('saturday')">
+                            <div class="th-container" id="saturday">
+                                <span class="day-btn material-symbols-outlined">check</span>
+                                <p>SÁBADO</p>
+                            </div>
+                        </th>
+                        <td class="calendar-cell"></td>
+                        <td class="calendar-cell"></td>
+                        <td class="calendar-cell"></td>
+                    </tr>
+                </table>
+            </div>
+            <input type="button" class="generate-btn" value="Gerar escala" onclick="generateScale()" disabled>
         </div>
-        <input type="button" class="generate-btn" value="Gerar escala" onclick="generateScale()">
-    </div>
-    <div class="alert-container">
-        <div class="pop-alert">
-            <h4>Alerta</h4>
-            <p id="pop-up"></p>
-            <input type="button" value="Fechar" onclick="closePopAlert()">
+        <div class="alert-container">
+            <div class="pop-alert">
+                <h4>Alerta</h4>
+                <p id="pop-up"></p>
+                <input type="button" value="Fechar" onclick="closePopAlert()">
+            </div>
         </div>
-    </div>
+    </main>
+    <footer>
+        <a href="mailto:andreygdula@gmail.com" target="_blank">
+            <p>Andrey Gdula &reg;</p>
+        </a>
+        <p>|</p>
+        <a href="https://github.com/andreygdula" target="_blank">
+            <p>GitHub</p>
+        </a>
+        <p>|</p>
+        <a href="https://www.linkedin.com/in/andreygdula" target="_blank">
+            <p>LinkedIn</p>
+        </a>
+    </footer>
 </body>
 </html>
