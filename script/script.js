@@ -7,6 +7,7 @@ const table = document.querySelector('#calendar-table')
 const generateButton = document.querySelector('input.generate-btn')
 const alertPopContainer = document.querySelector('div.alert-container')
 const alertPop = document.querySelector('p#pop-up')
+const btnAddGroup = document.querySelector('div.add-group')
 let workerList = []
 let dayScale = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
 
@@ -14,7 +15,8 @@ inputWorkers.addEventListener('keydown', function(event) {
     if (event.key === 'Enter' || event.key === ',') {
         generateButton.disabled = false
         event.preventDefault()
-        const name = inputWorkers.value.charAt(0).toUpperCase() + inputWorkers.value.trim().replace(',', '').slice(1).toLowerCase()
+        const capitalize = inputWorkers.value
+        const name = capitalizeNames(capitalize)
         if (name && !workerList.includes(name)) {
             createChip(name)
             inputWorkers.value = ''
@@ -25,6 +27,16 @@ inputWorkers.addEventListener('keydown', function(event) {
         }
     }
 })
+
+function capitalizeNames(str) {
+    return str
+        .trim()
+        .replace(',', '')
+        .toLowerCase()
+        .split(/\s+/)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+}
 
 function createChip(name) {
     const chip = document.createElement('div')
@@ -72,9 +84,14 @@ function activeSortable(el, isSource = false) {
     togglePlaceholder(el)
 }
 activeSortable(chipsContainer, true)
-activeSortable(group)
-document.querySelectorAll('td.calendar-cell').forEach(td => {
-    activeSortable(td)
+new Sortable(btnAddGroup, {
+    group: { name: 'restriction', pull: false, put: true },
+    animation: 150,
+    sort: false,
+    onAdd: function(evt) {
+        const chip = evt.item
+        createGroup(chip)
+    },
 })
 
 function togglePlaceholder(container) {
@@ -88,12 +105,13 @@ function togglePlaceholder(container) {
     }
 }
 
-function createGroup() {
+function createGroup(chip = null) {
     const divGroup = document.createElement('div')
     const closeGroup = document.createElement('span')
     divGroup.className = 'group'
     divGroup.innerHTML = '<span class="placeholder-restriction">Arraste aqui</span>'
     groupContainer.appendChild(divGroup)
+
     closeGroup.className = 'close-group material-symbols-outlined'
     closeGroup.innerHTML = 'close'
     closeGroup.onclick = () => {
@@ -101,7 +119,23 @@ function createGroup() {
     }
     divGroup.appendChild(closeGroup)
     activeSortable(divGroup)
+
+    if (chip) {
+        divGroup.appendChild(chip)
+        const deleteChip = chip.querySelector('.delete-chip')
+        if (deleteChip) {
+            deleteChip.onclick = function () {
+                chip.remove()
+                togglePlaceholder(divGroup)
+            }
+        }
+
+        togglePlaceholder(divGroup)
+        activeDeleteChipFonte()
+    }
+    return divGroup
 }
+
 
 // Função para ativar a funcionalidade de exclusão do chip fonte
 function activeDeleteChipFonte() {
