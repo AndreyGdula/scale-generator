@@ -93,6 +93,26 @@ new Sortable(btnAddGroup, {
         createGroup(chip)
     },
 })
+const tdCalendar = table.querySelectorAll('td.calendar-cell')
+tdCalendar.forEach(td => {
+    new Sortable(td, {
+        group: { name: 'restriction', pull: true, put: true },
+        animation: 150,
+        sort: true,
+        onAdd: function (evt) {
+            const chip = evt.item
+            const deleteChip = chip.querySelector('.delete-chip')
+            if (deleteChip) {
+                deleteChip.onclick = function () {
+                    chip.remove()
+                    togglePlaceholder(evt.to)
+                }
+            }
+            activeDeleteChipFonte()
+        }
+    })
+})
+
 
 function togglePlaceholder(container) {
     const placeholder = container.querySelector('span.placeholder-restriction')
