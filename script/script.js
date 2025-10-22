@@ -261,8 +261,18 @@ function getCellNames() {
             return
         }
 
-        const chips = tr.querySelectorAll('.chip .chip-name')
-        const names = Array.from(chips).map(chip => chip.textContent.trim())
+        const chips = tr.querySelectorAll('.chip')
+        const names = []
+        chips.forEach(c => {
+            const hasDelete = c.querySelector('.delete-chip')
+            console.log("hasDelete: ", hasDelete)
+            if (hasDelete) {
+                const nameSpan = c.querySelector('.chip-name')
+                if (nameSpan) {
+                    names.push(nameSpan.textContent.trim())
+                }
+            }
+        })
         fixedNames[day] = names
     })
     return fixedNames
@@ -276,7 +286,6 @@ function orderDays() {
     return days
 }
 
-// inicio teste de código
 function getRestrictionPairs() {
     const groups = getRestrictionGroups()
     const pairs = new Set()
@@ -286,12 +295,10 @@ function getRestrictionPairs() {
             for (let j = i + 1; j < group.length; j++) {
                 const a = group[i]
                 const b = group[j]
-                // Armazena sempre ordenado para evitar duplicatas (a,b) e (b,a)
-                pairs.add([a, b].sort().join('|'))
+                pairs.add([a, b].sort().join('|')) // Evita duplicatas
             }
         }
     })
-
     return pairs
 }
 
@@ -303,6 +310,7 @@ function sortWorkers(maxAttempts = 1000) {
     const days = orderDays()
     const restrictionPairs = getRestrictionPairs()
     const fixedNames = getCellNames()
+    console.log('Fixed Names:', fixedNames)
 
     let attempt = 0
     let workers, result
@@ -324,7 +332,7 @@ function sortWorkers(maxAttempts = 1000) {
 
             if (candidates.length === 0) {
                 failed = true
-                break // não conseguiu nesta tentativa, recomeça
+                break // Não conseguiu nesta tentativa, recomeça
             }
 
             const randomIndex = Math.floor(Math.random() * candidates.length)
@@ -335,15 +343,13 @@ function sortWorkers(maxAttempts = 1000) {
             dayIndex++
         }
         if (!failed) {
-            return result // deu certo, retorna
+            return result // Caso consiga, retorna
         }
         attempt++
     }
     showPopAlert('Não foi possível gerar a escala com as restrições atuais.')
     return null
 }
-
-// fim teste de código
 
 function fillTable(scale) {
     calendarCell.forEach(td => td.innerHTML = '')
