@@ -310,14 +310,13 @@ function sortWorkers(maxAttempts = 1000) {
     const days = orderDays()
     const restrictionPairs = getRestrictionPairs()
     const fixedNames = getCellNames()
-    console.log('Fixed Names:', fixedNames)
 
     let attempt = 0
     let workers, result
 
     while (attempt < maxAttempts) {
         workers = [...workerList.filter(n => !Object.values(fixedNames).flat().includes(n))]
-        result = {}
+        result = {...fixedNames}
         let dayIndex = 0
         let failed = false
 
@@ -364,10 +363,11 @@ function fillTable(scale) {
             }
         })
 
-        const numExtras = Math.ceil((names.length - tds.length) / tds.length)
-        tr.querySelector('th').rowSpan = numExtras + 1
+        const extraNeeded = Math.max(0, Math.ceil((names.length - tds.length) / tds.length))
+        tr.querySelector('th').rowSpan = Math.max(1, extraNeeded + 1)
 
         let extraIndex = tds.length
+        let lastRow = tr
         while (extraIndex < names.length) {
             const extraRow = document.createElement('tr')
             extraRow.className = 'extra-row'
@@ -382,7 +382,8 @@ function fillTable(scale) {
                 extraRow.appendChild(td)
                 extraIndex++
             }
-            tr.parentNode.insertBefore(extraRow, tr.nextSibling)
+            lastRow.parentNode.insertBefore(extraRow, lastRow.nextSibling)
+            lastRow = extraRow
         }
     })
 }
