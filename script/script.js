@@ -250,11 +250,29 @@ function getRestrictionGroups() {
     return groups
 }
 
+function getCellNames() {
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+    const fixedNames = {}
+
+    days.forEach(day => {
+        const tr = table.querySelector(`th#${day}`)?.parentElement
+        if (!tr) {
+            fixedNames[day] = []
+            return
+        }
+
+        const chips = tr.querySelectorAll('.chip .chip-name')
+        const names = Array.from(chips).map(chip => chip.textContent.trim())
+        fixedNames[day] = names
+    })
+    return fixedNames
+}
+
 function orderDays() {
-    const dayOrder = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+    const dayOrder = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
     const days = Array.from(new Set(dayScale))
         .filter(d => dayOrder.includes(d))
-        .sort((a,b) => dayOrder.indexOf(a) - dayOrder.indexOf(b));
+        .sort((a,b) => dayOrder.indexOf(a) - dayOrder.indexOf(b))
     return days
 }
 
@@ -284,12 +302,13 @@ function areCompatible(a, b, pairs) {
 function sortWorkers(maxAttempts = 1000) {
     const days = orderDays()
     const restrictionPairs = getRestrictionPairs()
+    const fixedNames = getCellNames()
 
     let attempt = 0
     let workers, result
 
     while (attempt < maxAttempts) {
-        workers = [...workerList]
+        workers = [...workerList.filter(n => !Object.values(fixedNames).flat().includes(n))]
         result = {}
         let dayIndex = 0
         let failed = false
