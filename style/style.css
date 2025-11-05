@@ -33,6 +33,10 @@ header {
     width: 100%;
 }
 
+h2 {
+    font-size: 1.17em;
+}
+
 div.chips-input, div.restriction-group, div.calendar {
     display: flex;
     justify-self: center;
